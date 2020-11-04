@@ -54,6 +54,7 @@
         "n2": num2,
         "opr":operate,
         "result": ans,
+        "created_at":firebase.database.ServerValue.TIMESTAMP
         
        
     })
@@ -62,14 +63,14 @@
   }
 
   //Listen for incoming messages
-  firebase.database().ref("results").limitToLast(10).on("child_added", function(snapshot) {
-   const show = document.querySelector('.show');
-
-    let html ="";
-    html += "<p>";
-    html +=snapshot.val().sender + ": " + snapshot.val().n1 +" " +  snapshot.val().opr + " "  + snapshot.val().n2 + " = " + snapshot.val().result;
-    html += "</p>";
-
-    show.innerHTML += html
+  firebase.database().ref('results').orderByChild('created_at').limitToLast(10).on('value', function(snapshot) {
+    var value = snapshot.val();
+    var htmls = [];
+    snapshot.forEach(function(child) {
+        let value = child.val();
+        htmls.unshift(`<p> ${value.sender}: ${value.n1}  ${value.opr} ${value.n2} = ${value.result} </p>`)
+    });
+    console.log(htmls);
+    $('.show').html(htmls);
 
   })
